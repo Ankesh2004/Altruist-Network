@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
+import "./Campaign.sol";
 
 contract CampaignFactory  {
+    event CampaignCreated(address manager,uint goal, address benefitedNGO);
     address [] public campaigns;
     mapping (address => bool) activeCampaign;
 
@@ -9,6 +11,7 @@ contract CampaignFactory  {
         Campaign newCampaign = new Campaign(goal, ngo);
         campaigns.push(address(newCampaign));
         activeCampaign[address(newCampaign)] = true;
+        emit CampaignCreated(msg.sender,goal,ngo);
     }
 
     function getActiveCampaigns() public view returns (address[] memory) {
