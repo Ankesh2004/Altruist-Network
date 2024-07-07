@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./campaign.sol";
 import "./ngoRegistry.sol";
-import "./donorRegistry.sol";
+import "./donorsRegistry.sol";
 
 contract CampaignFactory {
     event CampaignCreated(uint goal, address benefitedNGO, address campaignAddress);
