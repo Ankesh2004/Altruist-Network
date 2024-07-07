@@ -39,7 +39,7 @@ describe("campaignFactory", function () {
   });
 
   it("Should not allow non-registered NGO to create a campaign", async function () {
-    await expect(campaignFactory.connect(addr2).createCampaign(1000))
+    await expect(campaignFactory.connect(addr2).createCampaign("Helpful Campaign", "Campaign Description",100))
       .to.be.revertedWith("NGO not registered");
   });
 });

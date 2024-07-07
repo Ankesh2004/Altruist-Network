@@ -11,24 +11,24 @@ describe("campaign", function () {
         await donorRegistry.waitForDeployment();
 
         Campaign = await ethers.getContractFactory("Campaign");
-        campaign = await Campaign.deploy("Helpful Campaign", "Campaign Description", 1000, ngo.target, donorRegistry.target);
+        campaign = await Campaign.deploy("Helpful Campaign", "Campaign Description", 1000, ngo.address, donorRegistry.target);
         await campaign.waitForDeployment();
     })
     it("Should register donors", async function(){
         await donorRegistry.connect(donor1).registerDonor("Donor 1");
         await donorRegistry.connect(donor2).registerDonor("Donor 2");
-        expect(await donorRegistry.isRegisteredDonor(donor1.target)).to.equal(true);
-        expect(await donorRegistry.isRegisteredDonor(donor2.target)).to.equal(true);
+        expect(await donorRegistry.isRegisteredDonor(donor1.address)).to.equal(true);
+        expect(await donorRegistry.isRegisteredDonor(donor2.address)).to.equal(true);
     });
 
     it("Should allow donors to contribute to campaign", async function(){
         await campaign.connect(donor1).contribute({value : 100});
         expect (await campaign.raisedAmount()).to.equal(100);
-        expect (await campaign.contributions(donor1.target)).to.equal(100);
+        expect (await campaign.contributions(donor1.address)).to.equal(100);
 
         await campaign.connect(donor2).contribute({value : 200});
         expect (await campaign.raisedAmount()).to.equal(300);
-        expect (await campaign.contributions(donor2.target)).to.equal(200);
+        expect (await campaign.contributions(donor2.address)).to.equal(200);
     })
     it("Should not allow unregistered donors to contribute", async function () {
         await expect(campaign.connect(manager).contribute({ value: 500 }))
@@ -47,7 +47,7 @@ describe("campaign", function () {
         expect(await campaign.isActive()).to.equal(false);
     
         // Check the NGO balance
-        const ngoBalance = await ethers.provider.getBalance(ngo.target);
+        const ngoBalance = await ethers.provider.getBalance(ngo.address);
         expect(ngoBalance).to.equal(1100);
     });
     
@@ -61,16 +61,16 @@ describe("campaign", function () {
         await campaign.connect(donor1).contribute({ value: 500 });
         const summary = await campaign.getCampaignSummary();
     
-        expect(summary[0]).to.equal(manager.target);
+        expect(summary[0]).to.equal(manager.address);
         expect(summary[1]).to.equal(1000);
         expect(summary[2]).to.equal(500);
-        expect(summary[3]).to.equal(ngo.target);
+        expect(summary[3]).to.equal(ngo.address);
         expect(summary[4]).to.equal(true);
     });
     
     it("Should return correct user contribution", async function () {
         await campaign.connect(donor1).contribute({ value: 500 });
-        const contribution = await campaign.getUserContribution(donor1.target);
+        const contribution = await campaign.getUserContribution(donor1.address);
     
         expect(contribution).to.equal(500);
     });
@@ -81,6 +81,6 @@ describe("campaign", function () {
     
         const contributors = await campaign.getContributors();
     
-        expect(contributors).to.deep.equal([donor1.target, donor2.target]);
+        expect(contributors).to.deep.equal([donor1.address, donor2.address]);
       });
 });
