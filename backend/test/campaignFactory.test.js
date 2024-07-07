@@ -6,23 +6,24 @@ describe("campaignFactory", function () {
   beforeEach(async function () {
     [owner, addr1, addr2] = await ethers.getSigners();
 
-    DonorRegistry = await ethers.getContractFactory("donorRegistry");
+    DonorRegistry = await ethers.getContractFactory("DonorRegistry");
     donorRegistry = await DonorRegistry.deploy();
-    await donorRegistry.deployed();
+    await donorRegistry.waitForDeployment();
 
-    NGORegistry = await ethers.getContractFactory("ngoRegistry");
-    ngoRegistry = await NGORegistry.deploy(donorRegistry.address);
-    await ngoRegistry.deployed();
+    NGORegistry = await ethers.getContractFactory("NGORegistry");
+    ngoRegistry = await NGORegistry.deploy(donorRegistry.target);
+    await ngoRegistry.waitForDeployment();
+    
 
-    CampaignFactory = await ethers.getContractFactory("campaignFactory");
-    campaignFactory = await CampaignFactory.deploy(ngoRegistry.address, donorRegistry.address);
-    await campaignFactory.deployed();
+    CampaignFactory = await ethers.getContractFactory("CampaignFactory");
+    campaignFactory = await CampaignFactory.deploy(ngoRegistry.target, donorRegistry.target);
+    await campaignFactory.waitForDeployment();
 
-    Campaign = await ethers.getContractFactory("campaign");
+    Campaign = await ethers.getContractFactory("Campaign");
   });
 
   it("Should create a new campaign", async function () {
-    await ngoRegistry.connect(addr1).registerNGO("Helpful NGO", "NGO Description");
+    await ngoRegistry.connect(addr1).registerNGO("Helpful NGO", "NGO Description","0x");
 
     await campaignFactory.connect(addr1).createCampaign("Helpful Campaign", "Campaign Description",100);
     const campaigns = await campaignFactory.getActiveCampaigns();
@@ -30,7 +31,7 @@ describe("campaignFactory", function () {
   });
 
   it("Should emit CampaignCreated event", async function () {
-    await ngoRegistry.connect(addr1).registerNGO("Helpful NGO", "NGO Description");
+    await ngoRegistry.connect(addr1).registerNGO("Helpful NGO", "NGO Description","0x");
 
     await expect(campaignFactory.connect(addr1).createCampaign("Helpful Campaign", "Campaign Description",100))
       .to.emit(campaignFactory, 'CampaignCreated')
