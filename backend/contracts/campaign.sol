@@ -1,56 +1,63 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-contract Campaign{
-    event contributed(address contributor,uint amount, address benefitedNGO);
-    event donated(address campaign,address benefitedNGO, uint amount);
+import "./DonorRegistry.sol";
+
+contract Campaign {
+    event Contributed(address contributor, uint amount, address benefitedNGO);
+    event Donated(address campaign, address benefitedNGO, uint amount);
 
     address public manager;
     uint public goal;
     uint public raisedAmount;
     bool public isActive;
     address payable public benefitedNGO;
-    mapping(address=>uint) public contributions;
+    mapping(address => uint) public contributions;
     address[] public contributors;
 
-    constructor(uint256 campaignGoal, address payable ngoAddress) 
-    {
+    DonorRegistry public donorRegistry;
+
+    constructor(uint256 campaignGoal, address payable ngoAddress, address donorRegistryAddress) {
         goal = campaignGoal;
         benefitedNGO = ngoAddress;
         manager = msg.sender;
         isActive = true;
+        donorRegistry = DonorRegistry(donorRegistryAddress);
     }
-    function contribute() public payable
-    {
+
+    function contribute() public payable {
+        require(isActive, "Campaign is not active");
+        require(donorRegistry.isRegisteredDonor(msg.sender), "Only registered donors can contribute");
+        require(msg.value > 0, "Contribution amount should be greater than 0");
+        
         uint contributedAmount = msg.value;
-        raisedAmount+=contributedAmount;
-        if(contributions[msg.sender] == 0){
+        raisedAmount += contributedAmount;
+
+        if (contributions[msg.sender] == 0) {
             contributors.push(msg.sender);
         }
-        contributions[msg.sender]+=contributedAmount;
-        emit contributed(msg.sender,contributedAmount,address(this));
+        contributions[msg.sender] += contributedAmount;
+        emit Contributed(msg.sender, contributedAmount, benefitedNGO);
     }
-    function donate() public payable{
-        require(raisedAmount >= goal,"Campaign goal has not reached yet");
+
+    function donate() public {
+        require(raisedAmount >= goal, "Campaign goal has not been reached yet");
+        require(msg.sender == manager, "Only manager can donate");
+        
         benefitedNGO.transfer(raisedAmount);
         isActive = false;
-        emit donated(address(this), benefitedNGO, raisedAmount);
+        emit Donated(address(this), benefitedNGO, raisedAmount);
     }
-    function getUserContribution(address user) public view returns(uint){
+
+    function getUserContribution(address user) public view returns (uint) {
         return contributions[user];
     }
-    function getContributors() public view returns(string[] memory){
-        string [] memory contributorsList = new string[](contributors.length);
-        string memory temp;
 
-        for(uint i=0;i<contributors.length;i++){
-            temp = string(abi.encodePacked("Contributor: ",contributors[i]," Contribution: ",contributions[contributors[i]]));
-            contributorsList[i] = temp;
-        }
-        return contributorsList;
+    function getContributors() public view returns (address[] memory) {
+        return contributors;
     }
-    function getCampaignSummary() public view returns(address,uint,uint,address payable,bool){
-        return (manager,goal,raisedAmount,benefitedNGO,isActive);
+
+    function getCampaignSummary() public view returns (address, uint, uint, address payable, bool) {
+        return (manager, goal, raisedAmount, benefitedNGO, isActive);
     }
-    
 }
