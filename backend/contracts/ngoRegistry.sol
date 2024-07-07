@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "./DonorRegistry.sol";
+import "./donorRegistry.sol";
 
 contract NGORegistry {
     event NGORegistered(string name, string description, address ngoAddress);
