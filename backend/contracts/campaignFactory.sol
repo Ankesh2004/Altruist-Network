@@ -6,7 +6,7 @@ import "./ngoRegistry.sol";
 import "./donorRegistry.sol";
 
 contract CampaignFactory {
-    event CampaignCreated(string name, string description,uint goal, address benefitedNGO, address campaignAddress);
+    event CampaignCreated(string name, string description,uint goal, address benefitedNGO);
 
     address[] public campaigns;
     mapping(address => bool) public activeCampaign;
@@ -26,7 +26,7 @@ contract CampaignFactory {
         Campaign newCampaign = new Campaign(name, description, goal, payable(msg.sender), address(donorRegistry));
         campaigns.push(address(newCampaign));
         activeCampaign[address(newCampaign)] = true;
-        emit CampaignCreated(name, description, goal, msg.sender, address(newCampaign));
+        emit CampaignCreated(name, description, goal, msg.sender);
     }
 
     function getActiveCampaigns() public view returns (address[] memory) {

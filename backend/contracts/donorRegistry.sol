@@ -13,6 +13,7 @@ contract DonorRegistry {
     Donor[] public donors;
 
     function registerDonor(string memory name) public {
+        require(!isRegisteredDonor[msg.sender], "Donor already registered");
         Donor memory newDonor = Donor(name, 0);
         donors.push(newDonor);
         isRegisteredDonor[msg.sender] = true;

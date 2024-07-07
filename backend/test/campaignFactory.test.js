@@ -35,7 +35,7 @@ describe("campaignFactory", function () {
 
     await expect(campaignFactory.connect(addr1).createCampaign("Helpful Campaign", "Campaign Description",100))
       .to.emit(campaignFactory, 'CampaignCreated')
-      .withArgs("Helpful Campaign", "Campaign Description",100, addr1.address, campaigns[0]);
+      .withArgs("Helpful Campaign", "Campaign Description",100, addr1.address);
   });
 
   it("Should not allow non-registered NGO to create a campaign", async function () {
