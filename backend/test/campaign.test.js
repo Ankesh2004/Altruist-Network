@@ -1,10 +1,10 @@
 const {expect} = require("chai");
 
 describe("campaign", function () {
-    let Campaign,campaign,DonorRegistry,donorRegistry, manager, owner, donor1,donor2,ngo;
+    let Campaign,campaign,DonorRegistry,donorRegistry, owner, donor1,donor2,ngo;
 
     beforeEach(async function(){
-        [owner, manager, donor1, donor2, ngo] = await ethers.getSigners();
+        [owner, donor1, donor2, ngo] = await ethers.getSigners();
 
         DonorRegistry = await ethers.getContractFactory("DonorRegistry");
         donorRegistry = await DonorRegistry.deploy();
@@ -13,10 +13,11 @@ describe("campaign", function () {
         Campaign = await ethers.getContractFactory("Campaign");
         campaign = await Campaign.deploy("Helpful Campaign", "Campaign Description", 1000, ngo.address, donorRegistry.target);
         await campaign.waitForDeployment();
-    })
-    it("Should register donors", async function(){
+
         await donorRegistry.connect(donor1).registerDonor("Donor 1");
         await donorRegistry.connect(donor2).registerDonor("Donor 2");
+    })
+    it("Should register donors", async function(){
         expect(await donorRegistry.isRegisteredDonor(donor1.address)).to.equal(true);
         expect(await donorRegistry.isRegisteredDonor(donor2.address)).to.equal(true);
     });
@@ -31,29 +32,29 @@ describe("campaign", function () {
         expect (await campaign.contributions(donor2.address)).to.equal(200);
     })
     it("Should not allow unregistered donors to contribute", async function () {
-        await expect(campaign.connect(manager).contribute({ value: 500 }))
+        await expect(campaign.connect(owner).contribute({ value: 500 }))
           .to.be.revertedWith("Only registered donors can contribute");
     });
-    it("Should allow the manager to donate to the NGO once the goal is reached", async function () {
+    it("Should allow the NGO to withdraw funds once the goal is reached", async function () {
+        //  the initial NGO balance is 10000000000000000000000n (BigInt) in testnet ( hence failing the test)
+        const initialNGOBalance = BigInt(10000000000000000000000);
+        
         await campaign.connect(donor1).contribute({ value: 700 });
         await campaign.connect(donor2).contribute({ value: 400 });
     
         expect(await campaign.raisedAmount()).to.equal(1100);
-    
-        // Manager tries to donate to the NGO
-        await campaign.connect(manager).donate();
-    
-        // Check that the campaign is no longer active
+
+        expect(await campaign.isActive()).to.equal(true);
+        await campaign.connect(ngo).withdraw();
         expect(await campaign.isActive()).to.equal(false);
-    
-        // Check the NGO balance
+
         const ngoBalance = await ethers.provider.getBalance(ngo.address);
-        expect(ngoBalance).to.equal(1100);
+        expect(ngoBalance).to.equal(BigInt(initialNGOBalance + BigInt(1100)));
     });
     
-    it("Should not allow donations if the goal is not reached", async function () {
+    it("Should not allow withdrawal if the goal is not reached", async function () {
         await campaign.connect(donor1).contribute({ value: 50 });
-        await expect(campaign.connect(manager).donate())
+        await expect(campaign.connect(ngo).withdraw())
           .to.be.revertedWith("Campaign goal has not been reached yet");
     });
     
@@ -61,11 +62,12 @@ describe("campaign", function () {
         await campaign.connect(donor1).contribute({ value: 500 });
         const summary = await campaign.getCampaignSummary();
     
-        expect(summary[0]).to.equal(manager.address);
-        expect(summary[1]).to.equal(1000);
-        expect(summary[2]).to.equal(500);
-        expect(summary[3]).to.equal(ngo.address);
-        expect(summary[4]).to.equal(true);
+        expect(summary[0]).to.equal("Helpful Campaign");
+        expect(summary[1]).to.equal("Campaign Description");
+        expect(summary[2]).to.equal(1000);
+        expect(summary[3]).to.equal(500);
+        expect(summary[4]).to.equal(ngo.address);
+        expect(summary[5]).to.equal(true);
     });
     
     it("Should return correct user contribution", async function () {

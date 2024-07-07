@@ -5,9 +5,8 @@ import "./donorRegistry.sol";
 
 contract Campaign {
     event Contributed(address contributor, uint amount, address benefitedNGO);
-    event Donated(address campaign, address benefitedNGO, uint amount);
+    event Withdrawn(address campaign, address benefitedNGO, uint amount);
 
-    address public manager;
     string public name;
     string public description;
     uint public goal;
@@ -24,7 +23,6 @@ contract Campaign {
         description = _description;
         goal = campaignGoal;
         benefitedNGO = ngoAddress;
-        manager = msg.sender;
         raisedAmount = 0;
         isActive = true;
         donorRegistry = DonorRegistry(donorRegistryAddress);
@@ -37,7 +35,7 @@ contract Campaign {
         
         uint contributedAmount = msg.value;
         raisedAmount += contributedAmount;
-
+        
         if (contributions[msg.sender] == 0) {
             contributors.push(msg.sender);
         }
@@ -45,13 +43,13 @@ contract Campaign {
         emit Contributed(msg.sender, contributedAmount, benefitedNGO);
     }
 
-    function donate() public {
+    function withdraw() public{
         require(raisedAmount >= goal, "Campaign goal has not been reached yet");
-        require(msg.sender == manager, "Only manager can donate");
+        require(msg.sender == benefitedNGO, "Only NGO can withdraw the funds");
         
         benefitedNGO.transfer(raisedAmount);
         isActive = false;
-        emit Donated(address(this), benefitedNGO, raisedAmount);
+        emit Withdrawn(address(this), benefitedNGO, raisedAmount);
     }
 
     function getUserContribution(address user) public view returns (uint) {
@@ -62,7 +60,7 @@ contract Campaign {
         return contributors;
     }
 
-    function getCampaignSummary() public view returns (address, uint, uint, address payable, bool) {
-        return (manager, goal, raisedAmount, benefitedNGO, isActive);
+    function getCampaignSummary() public view returns (string memory,string memory, uint, uint, address payable, bool) {
+        return (name, description, goal, raisedAmount, benefitedNGO, isActive);
     }
 }
