@@ -8,6 +8,8 @@ contract Campaign {
     event Donated(address campaign, address benefitedNGO, uint amount);
 
     address public manager;
+    string public name;
+    string public description;
     uint public goal;
     uint public raisedAmount;
     bool public isActive;
@@ -17,7 +19,9 @@ contract Campaign {
 
     DonorRegistry public donorRegistry;
 
-    constructor(uint256 campaignGoal, address payable ngoAddress, address donorRegistryAddress) {
+    constructor(string memory _name, string memory _description ,uint256 campaignGoal, address payable ngoAddress, address donorRegistryAddress) {
+        name = _name;
+        description = _description;
         goal = campaignGoal;
         benefitedNGO = ngoAddress;
         manager = msg.sender;
