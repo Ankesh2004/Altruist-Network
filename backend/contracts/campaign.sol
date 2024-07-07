@@ -25,6 +25,7 @@ contract Campaign {
         goal = campaignGoal;
         benefitedNGO = ngoAddress;
         manager = msg.sender;
+        raisedAmount = 0;
         isActive = true;
         donorRegistry = DonorRegistry(donorRegistryAddress);
     }
