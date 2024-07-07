@@ -1,16 +1,16 @@
 const { expect } = require("chai");
 
 describe("ngoRegistry", function () {
-  let NGORegistry, DonorRegistry, ngoRegistry, donorsRegistry, owner, addr1;
+  let NGORegistry, DonorRegistry, ngoRegistry, donorRegistry, owner, addr1;
 
   beforeEach(async function () {
     [owner, addr1] = await ethers.getSigners();
-    DonorRegistry = await ethers.getContractFactory("donorsRegistry");
-    donorsRegistry = await DonorRegistry.deploy();
-    await donorsRegistry.deployed();
+    DonorRegistry = await ethers.getContractFactory("donorRegistry");
+    donorRegistry = await DonorRegistry.deploy();
+    await donorRegistry.deployed();
 
     NGORegistry = await ethers.getContractFactory("ngoRegistry");
-    ngoRegistry = await NGORegistry.deploy(donorsRegistry.address);
+    ngoRegistry = await NGORegistry.deploy(donorRegistry.address);
     await ngoRegistry.deployed();
   });
 
