@@ -3,20 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --foreground-color: #ffc045;
-  --background-color: #065471;
+  --primary-color: #ffc045;
+  --secondary-color: #065471;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-color: #ffc045;
-    --background-color: #065471;
+    --primary-color: #ffc045;
+    --secondary-color: #065471;
   }
-}
-
-body {
-  color: var(--foreground-color);
-  background: var(--background-color);
 }
 
 @layer utilities {

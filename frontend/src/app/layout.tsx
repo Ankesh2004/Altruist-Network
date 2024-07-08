@@ -1,17 +1,13 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+"use client";
+import { AppShell } from "@mantine/core";
 import "./globals.css";
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
-import '@mantine/core/styles.css';
-
-import { ColorSchemeScript, MantineProvider } from '@mantine/core';
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata = {
-  title: 'My Mantine app',
-  description: 'I have followed setup instructions carefully',
-};
+import "@mantine/core/styles.css";
+import { ColorSchemeScript, MantineProvider,Button } from "@mantine/core";
+import Image from "next/image";
+import Link from "next/link";
+import logo from "../../public/logos/logo.png";
 
 export default function RootLayout({
   children,
@@ -24,7 +20,28 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>{children}</MantineProvider>
+        <MantineProvider defaultColorScheme="light">
+          <AppShell
+            header={{ height: 75 }}
+            footer={{ height: 150 }}
+            padding="md"
+          >
+            <AppShell.Header>
+              <div className="w-full h-full flex flex-row items-center justify-between p-4 shadow-xl bg-secondaryColor">
+                <Link href={"/"} className="flex flex-row items-center ">
+                  <Image src={logo} alt="Logo" width={50} height={50} />
+                  <h2 className="text-primaryColor text-lg font-bold">
+                    Altruist Network
+                  </h2>
+                </Link>
+                <Button variant="outline" color="#ffc045" size="md" radius="md" >Connect Wallet</Button>
+              </div>
+              
+            </AppShell.Header>
+
+            <AppShell.Main>{children}</AppShell.Main>
+          </AppShell>
+        </MantineProvider>
       </body>
     </html>
   );
