@@ -24,7 +24,6 @@ export default function RootLayout({
           <AppShell
             header={{ height: 75 }}
             footer={{ height: 150 }}
-            padding="md"
           >
             <AppShell.Header>
               <div className="w-full h-full flex flex-row items-center justify-between p-4 shadow-xl bg-secondaryColor">
