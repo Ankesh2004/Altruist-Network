@@ -19,3 +19,28 @@
     text-wrap: balance;
   }
 }
+
+/* Custom scrollbar styles */
+.custom-scrollbar {
+  /* For Webkit browsers like Chrome, Safari */
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ff4b4b;
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* For Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}

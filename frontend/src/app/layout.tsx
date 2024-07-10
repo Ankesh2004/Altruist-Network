@@ -19,14 +19,14 @@ export default function RootLayout({
       <head>
         <ColorSchemeScript />
       </head>
-      <body>
+      <body className="custom-scrollbar">
         <MantineProvider defaultColorScheme="light">
           <AppShell
             header={{ height: 75 }}
             footer={{ height: 150 }}
           >
             <AppShell.Header>
-              <div className="w-full h-full flex flex-row items-center justify-between p-4 shadow-xl bg-secondaryColor">
+              <div className="w-full h-full flex flex-row items-center justify-between p-2 shadow-xl bg-secondaryColor">
                 <Link href={"/"} className="flex flex-row items-center p-2 gap-2">
                   <Image src={logo} alt="Logo" width={50} height={50} />
                   <h2 className="text-primaryColor text-lg font-bold">
