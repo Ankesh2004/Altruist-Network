@@ -4,7 +4,7 @@ import PaperRoundLeft from "../shared/PaperRoundLeft";
 
 const WhyDecentralization = () => {
   return (
-    <section className="flex flex-col w-full justify-around gap-4 py-12 bg-secondaryColor">
+    <section className="flex flex-col w-full justify-around gap-4 py-12 bg-secondaryColor mb-4">
       {/* Heading  */}
       <h1 className="sm:text-4xl text-3xl font-bold text-primaryColor text-center">
         Why Decentralization Matters ?
