@@ -18,6 +18,7 @@ const config: Config = {
         "primaryDarkColor": "#cf5123",
         "secondaryColor": "#065471",
         "secondaryDarkColor": "#000e40",
+        "borderColor": "#e2e8f0",
       },  
     },
   },

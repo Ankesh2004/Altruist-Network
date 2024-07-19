@@ -1,9 +1,9 @@
 import HeroSection from "@/components/landing/HeroSection";
 import WhyDecentralization from "@/components/landing/WhyDecentralization";
-import VerifyNGO from "../components/landing/VerifyNGO";
 import KnowMoreHDW from "@/components/landing/KnowMoreHDW";
 import OverviewCard from "@/components/landing/OverviewCard";
 import { overviewCardsData } from "@/data/landing/overviewCardsData";
+
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center">
