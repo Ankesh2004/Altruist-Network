@@ -6,6 +6,7 @@ import overviewRegisterCampaign from "../../../../../public/assets/overviewRegis
 import Live from "../../../../components/shared/Live";
 import { Button } from "@mantine/core";
 import ReadMore from "@/components/shared/ReadMore";
+import PDFList from "@/components/shared/PDFList";
 
 const dummyText = "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Incidunt, facilis praesentium, assumenda ratione, molestias explicabo officia nesciunt debitis quaerat asperiores maxime aut. Dolore sapiente, cum nobis fugiat in suscipit deleniti."
 

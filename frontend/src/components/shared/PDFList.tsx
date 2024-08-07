@@ -25,7 +25,7 @@ const PDFList = ({ pdfFiles }:{pdfFiles:File[]}) => {
               <span className="text-gray-700">{file.name}</span>
             </div>
             <button
-              onClick={() => handleDownload(file.url, file.name)}
+              onClick={() => handleDownload("File url", file.name)}
               className="flex items-center space-x-1 text-blue-500 hover:text-blue-700 transition-colors duration-200"
             >
               {/* <Download size={18} /> */}
