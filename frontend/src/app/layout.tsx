@@ -23,6 +23,10 @@ export default function RootLayout({
           <AppShell
             header={{ height: 60 }}
             footer={{ height: 150 }}
+            navbar={{
+              width: 240,
+              breakpoint: "sm",
+            }}
           >
             <AppShell.Header>
               <Header />
@@ -33,7 +37,9 @@ export default function RootLayout({
             </AppShell.Navbar>
 
             <AppShell.Main h="calc(100vh - var(--app-shell-header-height, 0px))">
-              {children}
+              <div className="p-4">
+                {children}
+              </div>
             </AppShell.Main>
           </AppShell>
         </MantineProvider>

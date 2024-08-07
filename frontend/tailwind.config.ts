@@ -19,7 +19,8 @@ const config: Config = {
         "secondaryColor": "#065471",
         "secondaryDarkColor": "#000e40",
         "borderColor": "#e2e8f0",
-        "lightGray": "#9CA3AF"
+        "lightGray": "#9CA3AF",
+        "secondaryText":"#6b7280"
       },  
     },
   },
