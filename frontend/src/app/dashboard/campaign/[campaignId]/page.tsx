@@ -61,9 +61,10 @@ const page = ({ params }: pageProps) => {
             </div>
             <p className="text-secondaryText">Live Since : 10th May, 2024</p>
           </p>
-
+          <div className="flex flex-col gap-1">
           <p>Started by : Campaigner Name</p>
-
+          <p>Category : Health</p>
+          </div>
           <Button
             variant="filled"
             color="#065471"
