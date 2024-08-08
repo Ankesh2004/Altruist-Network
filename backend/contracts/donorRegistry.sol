@@ -9,8 +9,23 @@ contract DonorRegistry {
         uint totalDonatedAmount;
     }
 
+    struct Donation {
+        uint amount;
+        uint timestamp;
+    }
+
     mapping(address => bool) public isRegisteredDonor;
     Donor[] public donors;
+
+    mapping(address => Donation[]) public donorDonations;
+
+    function recordDonation(address donor, uint amount) internal {
+        donorDonations[donor].push(Donation(amount, block.timestamp));
+    }
+
+    function getDonorDonations(address donor) public view returns (Donation[] memory) {
+        return donorDonations[donor];
+    }
 
     function registerDonor(string memory name) public {
         require(!isRegisteredDonor[msg.sender], "Donor already registered");
@@ -22,5 +37,8 @@ contract DonorRegistry {
 
     function getTopDonors() public view returns (Donor[] memory) {
         return donors;
+    }
+    function getNumberOfUniqueDonors() public view returns (uint) {
+        return donors.length;
     }
 }
