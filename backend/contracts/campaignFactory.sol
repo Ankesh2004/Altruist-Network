@@ -20,10 +20,11 @@ contract CampaignFactory {
     }
 
     function createCampaign(string memory name, string memory description, uint goal) public {
-        require(ngoRegistry.isRegisteredNGO(msg.sender), "NGO not registered");
+        // require(ngoRegistry.ngoIdByManager[msg.sender] == 0, "NGO not registered");
         require(!donorRegistry.isRegisteredDonor(msg.sender), "Donor cannot create campaign");
         require(goal > 0, "Goal should be greater than 0");
-        Campaign newCampaign = new Campaign(name, description, goal, payable(msg.sender), address(donorRegistry));
+        Campaign newCampaign = new Campaign(address(donorRegistry));
+        newCampaign.createCampaign(name, description, goal, payable(msg.sender));
         campaigns.push(address(newCampaign));
         activeCampaign[address(newCampaign)] = true;
         emit CampaignCreated(name, description, goal, msg.sender);

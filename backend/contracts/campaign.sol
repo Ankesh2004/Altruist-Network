@@ -18,24 +18,38 @@ contract Campaign {
 
     DonorRegistry public donorRegistry;
 
-    constructor(string memory _name, string memory _description ,uint256 campaignGoal, address payable ngoAddress, address donorRegistryAddress) {
+    constructor(address donorRegistryAddress) {
+        donorRegistry = DonorRegistry(donorRegistryAddress);
+    }
+
+    // Function to initialize the campaign details
+    function createCampaign(
+        string memory _name,
+        string memory _description,
+        uint256 campaignGoal,
+        address payable ngoAddress
+    ) public {
+        require(bytes(name).length == 0, "Campaign is already initialized");
+
         name = _name;
         description = _description;
         goal = campaignGoal;
         benefitedNGO = ngoAddress;
         raisedAmount = 0;
         isActive = true;
-        donorRegistry = DonorRegistry(donorRegistryAddress);
     }
 
     function contribute() public payable {
         require(isActive, "Campaign is not active");
-        require(donorRegistry.isRegisteredDonor(msg.sender), "Only registered donors can contribute");
+        require(
+            donorRegistry.isRegisteredDonor(msg.sender),
+            "Only registered donors can contribute"
+        );
         require(msg.value > 0, "Contribution amount should be greater than 0");
-        
+
         uint contributedAmount = msg.value;
         raisedAmount += contributedAmount;
-        
+
         if (contributions[msg.sender] == 0) {
             contributors.push(msg.sender);
         }
@@ -43,10 +57,10 @@ contract Campaign {
         emit Contributed(msg.sender, contributedAmount, benefitedNGO);
     }
 
-    function withdraw() public{
+    function withdraw() public {
         require(raisedAmount >= goal, "Campaign goal has not been reached yet");
         require(msg.sender == benefitedNGO, "Only NGO can withdraw the funds");
-        
+
         benefitedNGO.transfer(raisedAmount);
         isActive = false;
         emit Withdrawn(address(this), benefitedNGO, raisedAmount);
@@ -60,7 +74,18 @@ contract Campaign {
         return contributors;
     }
 
-    function getCampaignSummary() public view returns (string memory,string memory, uint, uint, address payable, bool) {
+    function getCampaignSummary()
+        public
+        view
+        returns (
+            string memory,
+            string memory,
+            uint,
+            uint,
+            address payable,
+            bool
+        )
+    {
         return (name, description, goal, raisedAmount, benefitedNGO, isActive);
     }
 }
