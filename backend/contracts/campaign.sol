@@ -10,7 +10,7 @@ contract Campaign {
     string public name;
     string public description;
     uint public goal;
-    uint public raisedAmount;
+    uint public raisedAmount;  
     bool public isActive;
     address payable public benefitedNGO;
     mapping(address => uint) public contributions;

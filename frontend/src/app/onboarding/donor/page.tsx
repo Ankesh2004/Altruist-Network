@@ -3,6 +3,9 @@ import React, { useState } from "react";
 import Dice from "../../../../public/icons/Dice";
 import { Input, Group, HoverCard, Button, Text } from "@mantine/core";
 import { generateUsername } from "unique-username-generator";
+import { ethers } from "ethers";
+import {abi,address} from "../../../../contractsData/donorRegistry";
+
 
 const page = () => {
   const [username, setUsername] = useState("");
@@ -10,6 +13,38 @@ const page = () => {
     const randomUsername = generateUsername("", 4);
     setUsername(randomUsername);
   };
+  const registerDonor = async (e: any, name: string) => {
+    e.preventDefault();
+
+    try {
+      const { ethereum } = window as unknown as Window & { ethereum: any };
+      if (!ethereum) {
+        console.log("MetaMask not detected");
+        return;
+      }
+
+      // Create a provider and signer
+      const provider = new ethers.BrowserProvider(ethereum);
+      const signer = await provider.getSigner();
+
+      // Create the contract instance
+      const donorRegistry = new ethers.Contract(address, abi, signer);
+
+      // Register the donor
+      await donorRegistry.registerDonor(name)
+      .then((tx) => {
+        console.log("Transaction hash:", tx.hash);
+        console.log("Donor registered successfully!");
+      })
+      .catch((error) => {
+        console.log("Error registering donor:", error);
+      });
+
+    } catch (error) {
+      console.log("Error connecting to MetaMask", error);
+    }
+};
+
   return (
     <div className="flex flex-col gap-8 items-center">
       <div className="flex flex-col gap-2 text-center">
@@ -46,7 +81,8 @@ const page = () => {
       </div>
 
       {username !==  '' &&
-        <Button variant="filled" color="#065471" size="lg" radius="md" className="transition transform">
+        <Button variant="filled" color="#065471" size="lg" radius="md" className="transition transform"
+        onClick={(e)=>registerDonor(e,username)}>
             Continue as {username}
         </Button>
         }
