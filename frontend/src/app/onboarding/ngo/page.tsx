@@ -3,6 +3,66 @@ import React, { useState } from "react";
 import Dropzone from "./Dropzone";
 import { Input, Group, HoverCard, Button, Text } from "@mantine/core";
 import { generateUsername } from "unique-username-generator";
+import * as Delegation from '@web3-storage/w3up-client/delegation'
+import * as Client from '@web3-storage/w3up-client'
+
+async function setupClient() {
+  const client = await Client.create()
+  
+  const keyURL = client.agent.did();
+  const apiUrl = `http://localhost:4001/api/w3up-delegation/${keyURL}`
+  
+  try {
+    const response = await fetch(apiUrl)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    console.log("Response headers:", response.headers);
+    
+    // Check if the response is Base64 encoded
+    const contentType = response.headers.get("Content-Type");
+    let arrayBuffer;
+    
+    if (contentType === "application/base64") {
+      const base64 = await response.text();
+      arrayBuffer = Uint8Array.from(atob(base64), c => c.charCodeAt(0)).buffer;
+    } else {
+      arrayBuffer = await response.arrayBuffer();
+    }
+    
+    console.log("Received data length:", arrayBuffer.byteLength);
+    
+    const delegation = await Delegation.extract(new Uint8Array(arrayBuffer))
+    
+    if (!delegation.ok) {
+      throw new Error('Failed to extract delegation', { cause: delegation.error })
+    }
+    
+    const space = await client.addSpace(delegation.ok)
+    await client.setCurrentSpace(space.did())
+    
+    console.log("Space:", space)
+    return client
+  } catch (error) {
+    console.error("Error in setupClient:", error);
+    throw error;
+  }
+}
+
+async function uploadFile(file:File) {
+  const client = await setupClient()
+  
+  try {
+    const cid = await client.uploadFile(file);
+    console.log(`File uploaded with CID: ${cid}`)
+    return cid
+  } catch (error) {
+    console.error('Error uploading file:', error)
+    throw error
+  }
+}
 
 const page = () => {
   const [username, setUsername] = useState("");
@@ -46,7 +106,14 @@ const page = () => {
         <div className="md:w-[32rem]">
           <h3 className="text-md ">NGO Authenticity Documents</h3>
           {/* Dropzone  */}
-          <Dropzone />
+          {/* <Dropzone /> */}
+          <input type="file" onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) {
+              console.log('Uploading file:', file);
+              uploadFile(file)
+            }
+          }} />
         </div>
       </div>
 
