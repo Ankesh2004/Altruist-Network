@@ -5,6 +5,7 @@ import { getDelegation } from './controllers/Delegation.js';
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
+import { ethers } from "hardhat";
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -39,6 +40,31 @@ app.get('/api/w3up-delegation/:did', async (req, res) => {
       res.status(500).send('Error creating delegation')
     }
   })
+
+// verify login signature
+app.get("/api/verify-login", async (req, res) => {
+    try {
+        const { message, address, signature } = req.query;
+        const recoveredAddress = ethers.utils.verifyMessage(message, signature);
+        if (recoveredAddress === address) {
+            return res.json({
+                success: true,
+                message: "Signature verified successfully"
+            });
+        } else {
+            return res.json({
+                success: false,
+                message: "Signature verification failed"
+            });
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        return res.json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+});
 
 // default route
 app.get("/", (req, res) => {
