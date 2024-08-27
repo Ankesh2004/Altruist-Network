@@ -6,6 +6,7 @@ contract DonorRegistry {
 
     struct Donor {
         string name;
+        address donorAddress;
         uint totalDonatedAmount;
     }
 
@@ -29,12 +30,27 @@ contract DonorRegistry {
 
     function registerDonor(string memory name) public {
         require(!isRegisteredDonor[msg.sender], "Donor already registered");
-        Donor memory newDonor = Donor(name, 0);
+        Donor memory newDonor = Donor(name, msg.sender, 0);
         donors.push(newDonor);
         isRegisteredDonor[msg.sender] = true;
         emit DonorRegistered(msg.sender);
     }
 
+    function checkRegistration() public view returns (bool) {
+        return isRegisteredDonor[msg.sender];
+    }
+
+    function getDonorDetails(address donor) public view returns (Donor memory) {
+        require(isRegisteredDonor[donor], "Donor not registered");
+        Donor memory donorDetails = Donor("", address(0), 0);
+        for (uint i = 0; i < donors.length; i++) {
+            if (donors[i].donorAddress == donor) {
+                donorDetails = donors[i];
+            }
+        }
+        return donorDetails;
+    }
+    
     function getTopDonors() public view returns (Donor[] memory) {
         return donors;
     }

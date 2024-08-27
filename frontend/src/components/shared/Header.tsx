@@ -1,13 +1,71 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../../public/logos/logo.png";
 import { Button } from "@mantine/core";
-import { ethers } from "ethers";
+import { ethers,Contract } from "ethers";
+import {address as donorRegistryAddress} from "../../../contractsData/donorRegistry";
+import {abi as donorRegistryAbi} from "../../../contractsData/donorRegistry";
 
 function generateLoginMessage(account: string) {
   return `Login to the NGO Donation Platform at ${new Date().toLocaleString()} with address: ${account}`;
 }
+async function getDonorDetails(account: string) {
+  try {
+    const { ethereum } = window as unknown as Window & { ethereum: any };
+    if (!ethereum) {
+      console.log("MetaMask not detected");
+      return;
+    }
+
+    const provider = new ethers.BrowserProvider(ethereum);
+    const signer = await provider.getSigner();
+    const donorRegistry = new Contract(donorRegistryAddress, donorRegistryAbi, signer);
+    console.log('Donor Registry:', donorRegistry);
+
+    // Check if the account is registered
+    console.log(`Checking registration status for account: ${account}`);
+    const isRegistered = await donorRegistry.isRegisteredDonor(account);
+    console.log(`isRegistered: ${isRegistered}`);
+    if (!isRegistered) {
+      console.log("Account is not registered");
+      return;
+    }
+    console.log('User is registered');
+
+    // Get donor details
+    const donorDetails = await donorRegistry.getDonorDetails(account);
+    console.log('Raw donor details:', donorDetails);
+
+    // Parse the donor details
+    const parsedDonorDetails = {
+      name: donorDetails[0],
+      donorAddress: donorDetails[1],
+      totalDonatedAmount: donorDetails[2].toString()
+    };
+
+    if(parsedDonorDetails){
+      sessionStorage.setItem('donorDetails', JSON.stringify(parsedDonorDetails));
+    }
+
+    console.log('Parsed donor details:', parsedDonorDetails);
+    return parsedDonorDetails;
+  } catch (e) {
+    console.error('Error in getDonorDetails:', e);
+    throw e;
+  }
+}
+
+function loadUserSession() {
+  const storedDonorDetails = sessionStorage.getItem('donorDetails');
+  if (storedDonorDetails) {
+    const donorDetails = JSON.parse(storedDonorDetails);
+    console.log("Restored donor details from session:", donorDetails);
+    // Use the donor details as needed
+  }
+}
+
+
 
 async function requestSignature(account: string, message: string) {
   try {
@@ -46,6 +104,9 @@ async function verifySignature(account: string, message: string, signature: stri
 }
 
 const Header = () => {
+  useEffect(() => {
+    loadUserSession();
+  }, []);
   async function handleLogin() {
     try {
       const { ethereum } = window as unknown as Window & { ethereum: any };
@@ -65,6 +126,9 @@ const Header = () => {
         if (isVerified) {
           console.log("User logged in successfully");
           // Proceed with login logic, e.g., send data to the backend
+          console.log(account);
+          const donorDetails = await getDonorDetails(account);
+          console.log("Donor details:", donorDetails);
         }
       }
     } catch (error) {
